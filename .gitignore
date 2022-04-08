@@ -29,10 +29,6 @@ application.yml
 application.properties
 *.properties
 
-### .txt ###
-devLog.txt
-*.txt
-
 ### .image ###
 *.jpeg
 *.png
