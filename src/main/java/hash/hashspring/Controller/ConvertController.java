@@ -5,12 +5,11 @@ import hash.hashspring.Service.FileService;
 import hash.hashspring.Service.KeyService;
 import hash.hashspring.Utils.BasicResponse;
 import hash.hashspring.Utils.CommonResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.*;
 import java.io.File;
@@ -23,6 +22,7 @@ public class ConvertController {
     private final KeyService keyService;
     private final FileService fileService;
 
+    @Autowired
     public ConvertController(KeyService keyService, FileService fileService) {
         this.keyService = keyService;
         this.fileService = fileService;
@@ -45,9 +45,17 @@ public class ConvertController {
      */
     @PostMapping("/hash")
     @ResponseBody
-    public String convertImgToHash(@RequestBody MFile mfile){
-        File resultFile = fileService.multipartToFile(mfile.getFile());
-        String resultBinary = fileService.fileToBinary(resultFile);
-        return resultBinary;
+    public String convertImgToHash(@ModelAttribute MFile mFile) throws IOException {
+        String converted = new String(mFile.getFile().getBytes());
+        System.out.println("converted:" + converted);
+        String encryptedData = keyService.encode(converted, mFile.getPublicKey());
+        return encryptedData;
+    }
+
+    @PostMapping("/test")
+    @ResponseBody
+    public String test(@ModelAttribute MFile mFile){
+        System.out.println(mFile.getFile().toString());
+        return "true";
     }
 }
