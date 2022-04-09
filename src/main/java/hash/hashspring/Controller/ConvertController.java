@@ -1,5 +1,7 @@
 package hash.hashspring.Controller;
 
+import hash.hashspring.Dto.Dec;
+import hash.hashspring.Dto.Enc;
 import hash.hashspring.Dto.MFile;
 import hash.hashspring.Service.FileService;
 import hash.hashspring.Service.KeyService;
@@ -14,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.security.Key;
 import java.util.HashMap;
 
 @Controller
@@ -26,6 +29,30 @@ public class ConvertController {
     public ConvertController(KeyService keyService, FileService fileService) {
         this.keyService = keyService;
         this.fileService = fileService;
+    }
+
+    /**
+     *  text2hash api
+     */
+    @GetMapping("/text2hash")
+    @ResponseBody
+    public ResponseEntity<? extends BasicResponse> text2HashController(@RequestBody Enc enc){
+        String plainText = enc.getPlainText();
+        String publicKey = enc.getPublicKey();
+        String result = keyService.encode(plainText, publicKey);
+        return ResponseEntity.ok().body(new CommonResponse<>(result));
+    }
+
+    /**
+     *  hash2text api
+     */
+    @GetMapping("/hash2text")
+    @ResponseBody
+    public ResponseEntity<? extends BasicResponse> hash2TextController(@RequestBody Dec dec){
+        String ciper = dec.getCiper();
+        String privateKey = dec.getPrivateKey();
+        String result = keyService.decode(ciper, privateKey);
+        return ResponseEntity.ok().body(new CommonResponse<>(result));
     }
 
     /**
